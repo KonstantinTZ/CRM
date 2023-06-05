@@ -70,8 +70,26 @@ function callChangePopup() {
   document.getElementById('open-delete-popup').addEventListener('click', function () {
     document.querySelector('.popup-new').classList.remove('open');
     // document.querySelector('.popup-rc').classList.add('open');
-    cleanPopUp()
+
+    surnameInput.value = ''
+    nameInput.value = ''
+    lastnameInput.value = ''
+    popUpErrorField.value = ''
+  
+    let contactblockArray = document.querySelectorAll('.contact-block')
+    for (const item of contactblockArray) {
+      item.remove()
+    }
+
+    let NumberizedId = Number(idInput.textContent)
+    
+    
     callDeletePopup()
+    document.getElementById('btn-delete-client').addEventListener('click', function () {
+      //удаляем клиента с сервера
+      deleteClientFromServer(NumberizedId)
+    });
+    idInput.textContent = ''
   });
 
 }
@@ -259,8 +277,8 @@ document.getElementById('btn-add-contact').addEventListener('click', function (e
 
 //====================================================================================================================================
 //Удаляем клиентов с сервера
-async function deleteClientFromServer(clientObj) {
-  const response = await fetch(`http://localhost:3000/api/clients/${clientObj.id}`, {
+async function deleteClientFromServer(clientObjId) {
+  const response = await fetch(`http://localhost:3000/api/clients/${clientObjId}`, {
     method: 'DELETE',
   });
   if (response.status === 404)
@@ -465,7 +483,7 @@ function getClientItem(client, clientsArray) { // аргумент индекс 
     callDeletePopup()
     document.getElementById('btn-delete-client').addEventListener('click', function () {
       //удаляем клиента с сервера
-      deleteClientFromServer(clientObj)
+      deleteClientFromServer(clientObj.id)
     });
   })
 
@@ -500,10 +518,10 @@ function getClientItem(client, clientsArray) { // аргумент индекс 
     let clientContactBulletItem = document.createElement('span')
     let clientContactBulletImage = document.createElement('img')
 
-    if (item.type === 'Телефон') clientContactBulletImage.src = '../img/contact-bullet-phone.svg'
-    if (item.type === 'Email') clientContactBulletImage.src = '../img/contact-bullet-mail.svg'
-    if (item.type === 'VK') clientContactBulletImage.src = '../img/contact-bullet-VK.svg'
-    if (item.type === 'Facebook') clientContactBulletImage.src = '../img/contact-bullet-facebook.svg'
+    if (item.type === 'Телефон') clientContactBulletImage.src = 'img/contact-bullet-phone.svg'
+    if (item.type === 'Email') clientContactBulletImage.src = 'img/contact-bullet-mail.svg'
+    if (item.type === 'VK') clientContactBulletImage.src = 'img/contact-bullet-VK.svg'
+    if (item.type === 'Facebook') clientContactBulletImage.src = 'img/contact-bullet-facebook.svg'
 
     clientContactBulletItem.append(clientContactBulletImage)
 
