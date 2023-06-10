@@ -151,7 +151,7 @@ main
 
 
 
-/* кода преминяем сортировку добавить ! */
+/* когда преминяем сортировку добавить ! */
 .table__thead-col--active .table__arrow {
   transform: rotateX(180deg);
 }
@@ -171,6 +171,7 @@ main
 .table__bullet {
   margin-right: 7px;
   opacity: 0.7;
+  cursor: pointer;
 }
 
 .table__bullet:hover {
@@ -706,6 +707,8 @@ popUp-new
   color: #F06A4D;
 }
 
+/* работа с прелоадером*/
+
 .preloader {
 height: 300px;
 opacity: 1;
@@ -752,4 +755,18 @@ visibility: visible;
   opacity: 0;
   transform: scale(0);
   z-index: -1;
+}
+
+.table__link {
+  color: #B0B0B0;
+  cursor: pointer;
+}
+
+.table__link:hover {
+  color: #9873FF
+}
+
+.table__link:active {
+  color: #F06A4D;
+  
 }

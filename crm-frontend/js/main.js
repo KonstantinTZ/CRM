@@ -75,15 +75,15 @@ function callChangePopup() {
     nameInput.value = ''
     lastnameInput.value = ''
     popUpErrorField.value = ''
-  
+
     let contactblockArray = document.querySelectorAll('.contact-block')
     for (const item of contactblockArray) {
       item.remove()
     }
 
     let NumberizedId = Number(idInput.textContent)
-    
-    
+
+
     callDeletePopup()
     document.getElementById('btn-delete-client').addEventListener('click', function () {
       //удаляем клиента с сервера
@@ -137,29 +137,37 @@ function addFormContacts(type, value) {
 
   let contactBlock = document.createElement('div')
   let contactInput = document.createElement('input')
+  contactInput.setAttribute('type', 'text')
 
 
 
   select.addEventListener('change', function () {
 
     contactsPlaceholders(select.value, contactInput)
-    // inputMaskChange ('input-tel')
+
 
   })
 
-  // inputMaskChange ('input-tel')
+  // добавление ИНпут Маск
 
+  contactInput.addEventListener('click', function () {
+    
+    mask('phone', {
+      mask: '+{7}(000)000-00-00',
+      lazy: false,
+    })
 
+    mask('vk', {
+      mask: '{vk.com/id}[000000000000]',
+      lazy: false,
+    })
 
+    mask('fb', {
+      mask: '{f\\acebook.com/id}[000000000000]',
+      lazy: false,
+    })
 
-
-
-
-
-
-
-
-
+  })
 
   contactsPlaceholders(select.value, contactInput)
 
@@ -199,18 +207,15 @@ function addFormContacts(type, value) {
 // inputmask
 
 
-//   let telMask = document.querySelectorAll(".input-tel");
-//   Inputmask({"mask": "+7 (999) 999-99-99" }).mask(telMask);
 
-// срабатывает на предидущий инпут
+const mask = (dataValue, options) => { // создаем универсальную функцию
+  const elements = document.querySelectorAll(`[data-mask="${dataValue}"]`) // ищем поля ввода по селектору с переданным значением data-атрибута
+  if (!elements) return console.log('я не сработал') // если таких полей ввода нет, прерываем функцию
 
-function inputMaskChange(value) {
-  let Mask = document.querySelectorAll(`.${value}`);
-  Inputmask({ "mask": "+7 (999) 999-99-99" }).mask(Mask);
-  console.log('Я работаю')
+  elements.forEach(el => { // для каждого из полей ввода
+    IMask(el, options) // инициализируем плагин imask для необходимых полей ввода с переданными параметрами маски
+  })
 }
-
-// Работает тоько с элементами из ХТМЛ , но не из созданных из ДжаваСкриипта
 
 //====================================================================================================================================
 // ф-я добавления плейсхолдеров 
@@ -226,7 +231,7 @@ function contactsPlaceholders(value, contactInput) {
     contactInput.classList.remove('input-facebook')
 
     contactInput.placeholder = '+7 (9**) ***-**-**'
-    // contactInput.dataset.inputmask = "'mask': '99-9999999'"
+    contactInput.dataset.mask = 'phone'
 
 
   }
@@ -237,6 +242,8 @@ function contactsPlaceholders(value, contactInput) {
     contactInput.classList.remove('input-VK')
     contactInput.classList.remove('input-facebook')
     contactInput.placeholder = 'example@mail.ru'
+
+    contactInput.dataset.mask = 'email'
   }
   if (value === 'VK') {
     contactInput.classList.add('input-VK')
@@ -245,8 +252,10 @@ function contactsPlaceholders(value, contactInput) {
     contactInput.classList.remove('input-tel')
     contactInput.classList.remove('input-facebook')
 
-    contactInput.placeholder = 'http://www.vk.com/id***'
-    contactInput.textContent = 'http://www.vk.com/id'
+    contactInput.placeholder = 'vk.com/id***'
+    contactInput.innerHTML = 'vk.com/id'
+
+    contactInput.dataset.mask = 'vk'
   }
   if (value === 'Facebook') {
     contactInput.classList.add('input-facebook')
@@ -255,8 +264,9 @@ function contactsPlaceholders(value, contactInput) {
     contactInput.classList.remove('input-VK')
     contactInput.classList.remove('input-tel')
 
-    contactInput.placeholder = 'http://www.facebook.com/id***'
-    contactInput.textContent = 'http://www.facebook.com/id'
+    contactInput.placeholder = 'facebook.com/id***'
+    contactInput.textContent = 'facebook.com/id'
+    contactInput.dataset.mask = 'fb'
   }
 }
 
@@ -312,109 +322,6 @@ if (data !== '' && data !== null) {
   clientsArray = data
 }
 
-// Создайте массив объектов студентов.Добавьте в него объекты студентов, например 5 студентов.
-// данные для проверки и работы БЕЗ сервера
-
-// let clientsArray = [
-//   {
-//     id: '346336',
-//     createdAt: '2021-02-03T13:07:29.554Z',
-//     updatedAt: '2021-02-03T13:07:29.554Z',
-//     name: 'Василий',
-//     surname: 'Пупкин',
-//     lastName: 'Васильевич',
-//     contacts: [
-//       {
-//         type: 'Телефон',
-//         value: '+71234567890'
-//       },
-//       {
-//         type: 'Email',
-//         value: 'abc@xyz.com'
-//       },
-//       {
-//         type: 'Facebook',
-//         value: 'https://facebook.com/vasiliy-pupkin-the-best'
-//       }
-//     ]
-//   },
-//   {
-//     id: '24523256',
-//     createdAt: '2021-02-03T13:07:29.554Z',
-//     updatedAt: '2017-04-03T13:03:40.554Z',
-//     name: 'Александр',
-//     surname: 'Дерипаска',
-//     lastName: 'Юрьевич',
-//     contacts: [
-//       {
-//         type: 'Email',
-//         value: 'jenga@gmail.com'
-//       },
-//       {
-//         type: 'Телефон',
-//         value: '+79818234343'
-//       },
-//       {
-//         type: 'VK',
-//         value: 'http://vk.com/id243522'
-//       },
-//       {
-//         type: 'Facebook',
-//         value: 'http://facebook.com/id245225'
-//       },
-//       {
-//         type: 'Facebook',
-//         value: 'http://facebook.com/id19403'
-//       }
-
-//     ]
-
-//   },
-//   {
-//     id: '35632246',
-//     createdAt: '2021-02-03T13:07:29.554Z',
-//     updatedAt: '2017-04-03T13:03:40.554Z',
-//     name: 'Георгий',
-//     surname: 'Лихолетов',
-//     lastName: 'Максимович',
-//     contacts: [
-//       {
-//         type: 'Телефон',
-//         value: '+79111234567'
-//       },
-//       {
-//         type: 'Email',
-//         value: 'avd@gmail.com'
-//       },
-//       {
-//         type: 'VK',
-//         value: 'http://vk.com/id19403'
-//       },
-//       {
-//         type: 'VK',
-//         value: 'http://vk.com/id19403'
-//       },
-//       {
-//         type: 'Facebook',
-//         value: 'http://facebook.com/id19403'
-//       },
-//       {
-//         type: 'VK',
-//         value: 'http://vk.com/id19403'
-//       },
-//       {
-//         type: 'VK',
-//         value: 'http://vk.com/id19403'
-//       },
-//       {
-//         type: 'VK',
-//         value: 'http://vk.com/id999999'
-//       }
-//     ]
-
-//   }
-// ]
-
 //====================================================================================================================================
 //ф-я по загрузке одного клиента с сервера
 
@@ -429,17 +336,16 @@ async function getClientItemFromServer(clientId) {
 
 //====================================================================================================================================
 //Попытка сделать так, кто бы открывалась ссылке
-// НЕ РАБОТАЕТ, т.к. при открытии через кнопку изменить появляется новых ХЕШ в URL 
 
-// window.addEventListener('hashchange', async function(event) {
-//   callChangePopup()
-//     document.querySelector('.popup-new__preloader').classList.remove('popup-new__preloader--hidden')
-//     // загружаем занные конкретного клиента заново с сервера, вдруг там что то изменилось
-//     console.log('event.newURL.slice(1)')
-//     console.log(event.newURL.slice(1))
-//     let clientObjFromServer = await getClientItemFromServer(window.location.hash)
-//     renderChangeForm(clientObjFromServer.id, clientObjFromServer.surname, clientObjFromServer.name, clientObjFromServer.lastName, clientObjFromServer.contacts)
-// })
+window.addEventListener('hashchange', async function(event) {
+  callChangePopup()
+    document.querySelector('.popup-new__preloader').classList.remove('popup-new__preloader--hidden')
+    // загружаем занные конкретного клиента заново с сервера, вдруг там что то изменилось
+    let clientObjFromServer = await getClientItemFromServer(window.location.hash.slice(1))
+    console.log('window.location.hash')
+    console.log(window.location.hash)
+    renderChangeForm(clientObjFromServer.id, clientObjFromServer.surname, clientObjFromServer.name, clientObjFromServer.lastName, clientObjFromServer.contacts)
+})
 
 //=====================================================================================================================================
 //Создайте функцию вывода одного студента в таблицу, по аналогии с тем, как вы делали вывод одного дела в модуле 8. Функция должна вернуть html элемент с информацией и пользователе.У функции должен быть один аргумент - объект студента.
@@ -456,6 +362,8 @@ function getClientItem(client, clientsArray) { // аргумент индекс 
   let fourthColumn = document.createElement('td')
   let fivesColumn = document.createElement('td')
   let sixtColumn = document.createElement('td')
+  //ссылка на клиента
+  let seventhColumn = document.createElement('td')
 
 
   let changeButton = document.createElement('button')
@@ -472,7 +380,7 @@ function getClientItem(client, clientsArray) { // аргумент индекс 
     renderChangeForm(clientObjFromServer.id, clientObjFromServer.surname, clientObjFromServer.name, clientObjFromServer.lastName, clientObjFromServer.contacts)
 
     // создаем хеш часть, что бы можно было делиться ссылкой
-    window.location.hash = clientObjFromServer.id
+    
   })
 
   let deleteButton = document.createElement('button')
@@ -542,6 +450,13 @@ function getClientItem(client, clientsArray) { // аргумент индекс 
     })
   }
 
+  let clientsLink = document.createElement('a')
+  clientsLink.classList.add('table__link')
+  clientsLink.innerHTML = 'Ссылка'
+
+  clientsLink.setAttribute('href', `http://127.0.0.1:5500/frontend-pro/index.html#${clientObj.id}`)
+  clientsLink.dataset.tippyContent = 'Нажмите правой кнопкой мыши и выбирете пункт: "Копировать адрес ссылки"'
+
   tableBody.appendChild(tableRow) // добавляем эти колонки в  ШТМЛ
 
   tableRow.appendChild(firstColumn)
@@ -561,11 +476,11 @@ function getClientItem(client, clientsArray) { // аргумент индекс 
 
   sixtColumn.append(changeButton)
   sixtColumn.append(deleteButton)
+
+  tableRow.appendChild(seventhColumn)
+  seventhColumn.append(clientsLink)
+
 }
-
-
-
-
 
 //====================================================================================================================================
 // ф-я реддера всей таблицы
@@ -680,10 +595,6 @@ function cleanPopUp() {
 }
 
 
-
-
-
-
 //====================================================================================================================================
 // действия при нажатии на кнопку Сохранить НА попапе добавить нового клиента
 
@@ -727,15 +638,14 @@ document.getElementById('btn-add-client').addEventListener('click', function (el
     clearTable()
     renderClientsTable(clientsArray)
     document.querySelector('.popup-new__error-msg-box').innerHTML = ' '
+    // обновляет страницу после добавления новго клиента
+    location.reload();
 
   } else {
     document.querySelector('.popup-new__error-msg-box').innerHTML = "Заполните все поля в форме со звездочкам  <br> и добавьте хотя бы один контакт";
 
   }
 })
-
-
-
 
 //====================================================================================================================================
 // Ф-я отправки на сервер !
@@ -756,18 +666,16 @@ async function createNewClientServer(name, surname, lastname, contacts) {
     document.querySelector('.popup-new__preloader').classList.add('popup-new__preloader--hidden')
   } else {
     document.querySelector('.popup-new__preloader').classList.add('popup-new__preloader--hidden')
-    console.log(response.status )
-    
-    if (response.status !== 422 || response.status !== 404) {
+      if (response.status !== 422 || response.status !== 404) {
       popUpErrorField.innerHTML = 'Что то пошло не так ...' + ' Status: ' + response.status + '  '
-      
+
     }
-    
+
   }
   const data = await response.json();
   console.log(data);
 
-  
+
   console.log(data.errors.length)
 
   for (const item of data.errors) {
@@ -796,18 +704,18 @@ async function changeClientServer(id, name, surname, lastname, contacts) {
     //ЕСЛИ Респонс не ОК, то обрвтно убираем прелоадер и выводим ссобщения об ошибках
     document.querySelector('.popup-new__preloader').classList.add('popup-new__preloader--hidden')
     // alert("Ошибка HTTP: " + response.status);
-    console.log(response.status )
-    
+    console.log(response.status)
+
     if (response.status !== 422 || response.status !== 404) {
       popUpErrorField.innerHTML = 'Что то пошло не так ...' + ' Status: ' + response.status + '  '
-      
+
     }
-    
+
   }
   const data = await response.json();
   console.log(data);
 
-  
+
   console.log(data.errors.length)
 
   for (const item of data.errors) {
@@ -815,23 +723,6 @@ async function changeClientServer(id, name, surname, lastname, contacts) {
   }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //====================================================================================================================================
@@ -861,13 +752,7 @@ document.getElementById('btn-change-client').addEventListener('click', function 
   changedClient.lastName = lastnameInput.value.slice(0, 1).toUpperCase() + lastnameInput.value.slice(1)
   changedClient.contacts = formContactArr
 
-
-
-
-
-
   if (nameInput !== '' && surnameInput !== '' && formContactArr.length >= 1 && document.querySelector('.contact-block__inp').value !== '') {
-
 
     document.querySelector('.popup-new__preloader').classList.remove('popup-new__preloader--hidden')
     changeClientServer(changedClient.id, changedClient.name, changedClient.surname, changedClient.lastName, changedClient.contacts)
@@ -876,6 +761,8 @@ document.getElementById('btn-change-client').addEventListener('click', function 
     clearTable()
     renderClientsTable(clientsArray)
     document.querySelector('.popup-new__error-msg-box').innerHTML = ' '
+    // обновляет страницу после добавления новго клиента
+    location.reload();
 
   } else {
     document.querySelector('.popup-new__error-msg-box').innerHTML = "Заполните все поля в форме со звездочкам <br> и добавьте хотя бы один контакт";
@@ -883,52 +770,6 @@ document.getElementById('btn-change-client').addEventListener('click', function 
   }
 
 });
-
-
-
-//====================================================================================================================================
-// Функционал SearchBar который Работает с МАССИВОМ уже отрендериндом на странице
-
-// document.getElementById('search-bar').addEventListener('keyup', function () {
-//   searchFn()
-// })
-
-
-// function searchFn() {
-//   let filter = document.getElementById('search-bar').value.toUpperCase();
-//   console.log(filter)
-//   let table = document.querySelector('.table__tbody')
-//   let tr = table.getElementsByTagName('tr')
-
-//   for (let i = 0; i < tr.length; i++) {
-//     let td = tr[i].getElementsByTagName('td')[1];
-
-//     if (td) {
-//       let textvlaue = td.textContent || td.innerHTML;
-
-//       if (textvlaue.toUpperCase().indexOf(filter) > -1) {
-//         tr[i].style.display = "";
-//       } else {
-//         tr[i].style.display = "none";
-//       }
-//     }
-//   }
-// }
-
-
-
-//====================================================================================================================================
-// Функционал SearchBar Работает с МАССИВОМ уже отрендериндом на странице, метод 2 НЕ ОПРОБАВАННО
-// document.getElementById('search').addEventListener("keyup", function(){
-//   let search = this.value.toLowerCase();
-//   newarray = array.filter(function (val) {
-//   if(val.id.includes(search) || val.name.includes(search) || val.country.includes(search) || val.city.includes(search) ){
-//   var newobj = {id : val.id , name : val.name , country : val.country , city: val.city}
-//   return newobj;
-//   }
-//   })
-//   showtable(newarray) ;
-//   })
 
 //====================================================================================================================================
 // ф-я пулучения массива клиентов по поисковому запросу с СЕРВЕРА
