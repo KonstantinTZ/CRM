@@ -335,15 +335,13 @@ async function getClientItemFromServer(clientId) {
 }
 
 //====================================================================================================================================
-//Попытка сделать так, кто бы открывалась ссылке
+//открытие по ссылке
 
 window.addEventListener('hashchange', async function(event) {
   callChangePopup()
     document.querySelector('.popup-new__preloader').classList.remove('popup-new__preloader--hidden')
     // загружаем занные конкретного клиента заново с сервера, вдруг там что то изменилось
     let clientObjFromServer = await getClientItemFromServer(window.location.hash.slice(1))
-    console.log('window.location.hash')
-    console.log(window.location.hash)
     renderChangeForm(clientObjFromServer.id, clientObjFromServer.surname, clientObjFromServer.name, clientObjFromServer.lastName, clientObjFromServer.contacts)
 })
 
@@ -387,11 +385,13 @@ function getClientItem(client, clientsArray) { // аргумент индекс 
   deleteButton.classList.add('btn', 'table__btn', 'table__btn-delete')
   deleteButton.textContent = 'Удалить'
 
-  deleteButton.addEventListener('click', function () {
+  deleteButton.addEventListener('click', function (elem) {
+    elem.preventDefault()
     callDeletePopup()
     document.getElementById('btn-delete-client').addEventListener('click', function () {
       //удаляем клиента с сервера
       deleteClientFromServer(clientObj.id)
+      tableRow.remove()
     });
   })
 
@@ -454,7 +454,7 @@ function getClientItem(client, clientsArray) { // аргумент индекс 
   clientsLink.classList.add('table__link')
   clientsLink.innerHTML = 'Ссылка'
 
-  clientsLink.setAttribute('href', `http://127.0.0.1:5500/frontend-pro/index.html#${clientObj.id}`)
+  clientsLink.setAttribute('href', `${window.location}#${clientObj.id}`) //${window.location} более корректно т.к. берет реальный адрес
   clientsLink.dataset.tippyContent = 'Нажмите правой кнопкой мыши и выбирете пункт: "Копировать адрес ссылки"'
 
   tableBody.appendChild(tableRow) // добавляем эти колонки в  ШТМЛ
@@ -598,8 +598,8 @@ function cleanPopUp() {
 //====================================================================================================================================
 // действия при нажатии на кнопку Сохранить НА попапе добавить нового клиента
 
-document.getElementById('btn-add-client').addEventListener('click', function (elem) {
-  elem.preventDefault();
+document.getElementById('btn-add-client').addEventListener('click', async function (event) {
+  event.preventDefault();
   let newClient = {}
   let formContactArr = []
 
@@ -615,8 +615,7 @@ document.getElementById('btn-add-client').addEventListener('click', function (el
     formContactArr.push(formContactObg)
   }
 
-  console.log('contactBlock')
-  console.log(contactBlock)
+
   newClient.name = nameInput.value.slice(0, 1).toUpperCase() + nameInput.value.slice(1)
   newClient.surname = surnameInput.value.slice(0, 1).toUpperCase() + surnameInput.value.slice(1)
   newClient.lastName = lastnameInput.value.slice(0, 1).toUpperCase() + lastnameInput.value.slice(1)
@@ -632,14 +631,11 @@ document.getElementById('btn-add-client').addEventListener('click', function (el
 
     // Этап перевода на сервер
     document.querySelector('.popup-new__preloader').classList.remove('popup-new__preloader--hidden')
-    createNewClientServer(newClient.name, newClient.surname, newClient.lastName, newClient.contacts)
+    await createNewClientServer(newClient)
 
     // clientsArray.push(newClient)
-    clearTable()
-    renderClientsTable(clientsArray)
-    document.querySelector('.popup-new__error-msg-box').innerHTML = ' '
-    // обновляет страницу после добавления новго клиента
-    location.reload();
+    
+    
 
   } else {
     document.querySelector('.popup-new__error-msg-box').innerHTML = "Заполните все поля в форме со звездочкам  <br> и добавьте хотя бы один контакт";
@@ -651,19 +647,27 @@ document.getElementById('btn-add-client').addEventListener('click', function (el
 // Ф-я отправки на сервер !
 
 
-async function createNewClientServer(name, surname, lastname, contacts) {
+async function createNewClientServer(clientObj) { // ИСПРАВЛЕНО
   const response = await fetch('http://localhost:3000/api/clients', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      name: name,
-      surname: surname,
-      lastName: lastname,
-      contacts: contacts
+      name: clientObj.name,
+      surname: clientObj.surname,
+      lastName: clientObj.lastName,
+      contacts: clientObj.contacts
     })
   });
   if (response.ok) {
     document.querySelector('.popup-new__preloader').classList.add('popup-new__preloader--hidden')
+    //если респонс - ОК закрываем ПОАП, чистим попап, чистим tbody,загружаем новый список криентов с сервера в Аррей, рендерим таблицу из Нового Аррея, чистим поле ошибок
+    document.querySelector('.popup-new').classList.remove('open');
+    cleanPopUp()
+    clearTable()
+    loadClientsArrFromServer()
+    renderClientsTable(clientsArray)
+    document.querySelector('.popup-new__error-msg-box').innerHTML = ' '
+    
   } else {
     document.querySelector('.popup-new__preloader').classList.add('popup-new__preloader--hidden')
       if (response.status !== 422 || response.status !== 404) {
@@ -687,19 +691,26 @@ async function createNewClientServer(name, surname, lastname, contacts) {
 //====================================================================================================================================
 // Ф-я изменения на сервере !
 
-async function changeClientServer(id, name, surname, lastname, contacts) {
-  const response = await fetch(`http://localhost:3000/api/clients/${id}`, {
+async function changeClientServer(clientObj) { // ИСПРАВЛЕНО
+  const response = await fetch(`http://localhost:3000/api/clients/${clientObj.id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      name: name,
-      surname: surname,
-      lastName: lastname,
-      contacts: contacts
+      name: clientObj.name,
+      surname: clientObj.surname,
+      lastName: clientObj.lastName,
+      contacts: clientObj.contacts
     })
   });
   if (response.ok) {
     document.querySelector('.popup-new__preloader').classList.add('popup-new__preloader--hidden')
+    //если респонс - ОК закрываем ПОАП, чистим попап, чистим tbody,загружаем новый список криентов с сервера в Аррей, рендерим таблицу из Нового Аррея, чистим поле ошибок
+    document.querySelector('.popup-new').classList.remove('open');
+    cleanPopUp()
+    clearTable()
+    loadClientsArrFromServer()
+    renderClientsTable(clientsArray)
+    document.querySelector('.popup-new__error-msg-box').innerHTML = ' '
   } else {
     //ЕСЛИ Респонс не ОК, то обрвтно убираем прелоадер и выводим ссобщения об ошибках
     document.querySelector('.popup-new__preloader').classList.add('popup-new__preloader--hidden')
@@ -755,14 +766,13 @@ document.getElementById('btn-change-client').addEventListener('click', function 
   if (nameInput !== '' && surnameInput !== '' && formContactArr.length >= 1 && document.querySelector('.contact-block__inp').value !== '') {
 
     document.querySelector('.popup-new__preloader').classList.remove('popup-new__preloader--hidden')
-    changeClientServer(changedClient.id, changedClient.name, changedClient.surname, changedClient.lastName, changedClient.contacts)
+    changeClientServer(changedClient)
 
-    // clientsArray.push(newClient)
+    // clientsArray.push(changedClient)
     clearTable()
     renderClientsTable(clientsArray)
     document.querySelector('.popup-new__error-msg-box').innerHTML = ' '
-    // обновляет страницу после добавления новго клиента
-    location.reload();
+
 
   } else {
     document.querySelector('.popup-new__error-msg-box').innerHTML = "Заполните все поля в форме со звездочкам <br> и добавьте хотя бы один контакт";
