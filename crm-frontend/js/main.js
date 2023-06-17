@@ -349,9 +349,9 @@ window.addEventListener('hashchange', async function(event) {
 //Создайте функцию вывода одного студента в таблицу, по аналогии с тем, как вы делали вывод одного дела в модуле 8. Функция должна вернуть html элемент с информацией и пользователе.У функции должен быть один аргумент - объект студента.
 let tableBody = document.querySelector('.table__tbody')
 
-function getClientItem(client, clientsArray) { // аргумент индекс в массиве , массив студентов
-  let clientObj
-  clientObj = clientsArray[client] // для удобства работы выделяем объект
+function getClientItem(client) { // аргумент индекс в массиве , массив студентов
+  let clientObj = client
+  //clientObj = clientsArray[client] // для удобства работы выделяем объект
 
   let tableRow = document.createElement('tr') // создаем строку в таблицу
   let firstColumn = document.createElement('td') // создаем колонку в строке
@@ -457,7 +457,7 @@ function getClientItem(client, clientsArray) { // аргумент индекс 
   clientsLink.setAttribute('href', `${window.location}#${clientObj.id}`) //${window.location} более корректно т.к. берет реальный адрес
   clientsLink.dataset.tippyContent = 'Нажмите правой кнопкой мыши и выбирете пункт: "Копировать адрес ссылки"'
 
-  tableBody.appendChild(tableRow) // добавляем эти колонки в  ШТМЛ
+  // tableBody.appendChild(tableRow) // добавляем эти колонки в  ШТМЛ
 
   tableRow.appendChild(firstColumn)
   tableRow.appendChild(secondColumn)
@@ -479,15 +479,16 @@ function getClientItem(client, clientsArray) { // аргумент индекс 
 
   tableRow.appendChild(seventhColumn)
   seventhColumn.append(clientsLink)
-
+  return tableRow
 }
 
 //====================================================================================================================================
 // ф-я реддера всей таблицы
 
 function renderClientsTable(clientsArray) {
-  for (let item in clientsArray) {
-    getClientItem(item, clientsArray)
+  tableBody.innerHTML = '' // очистка таблицы перед новым рендерингом и никакой ф-ии для очистки не нужно, tablebody ранее объявлен
+  for (let item of clientsArray) {
+    tableBody.append(getClientItem(item))
   }
 
   // Для работы библиотеки ТИПИИ. данные записаны в ДАТА-АТРИБУТ
@@ -509,12 +510,12 @@ renderClientsTable(clientsArray)
 
 let table = document.getElementById('table')
 
-function clearTable() {
-  table.removeChild(tableBody)
-  tableBody = document.createElement('tbody');
-  tableBody.classList.add('table__tbody');
-  table.appendChild(tableBody);
-}
+// function clearTable() {
+//   table.removeChild(tableBody)
+//   tableBody = document.createElement('tbody');
+//   tableBody.classList.add('table__tbody');
+//   table.appendChild(tableBody);
+// }
 
 //====================================================================================================================================
 // ф-я высчитавания даты из данных получаемых с сервера
@@ -634,7 +635,7 @@ document.getElementById('btn-add-client').addEventListener('click', async functi
     await createNewClientServer(newClient)
 
     // clientsArray.push(newClient)
-    
+    renderClientsTable(clientsArray)
     
 
   } else {
@@ -660,12 +661,10 @@ async function createNewClientServer(clientObj) { // ИСПРАВЛЕНО
   });
   if (response.ok) {
     document.querySelector('.popup-new__preloader').classList.add('popup-new__preloader--hidden')
-    //если респонс - ОК закрываем ПОАП, чистим попап, чистим tbody,загружаем новый список криентов с сервера в Аррей, рендерим таблицу из Нового Аррея, чистим поле ошибок
+    //если респонс - ОК закрываем ПОАП, чистим попап
     document.querySelector('.popup-new').classList.remove('open');
     cleanPopUp()
-    clearTable()
-    loadClientsArrFromServer()
-    renderClientsTable(clientsArray)
+    
     document.querySelector('.popup-new__error-msg-box').innerHTML = ' '
     
   } else {
@@ -704,13 +703,9 @@ async function changeClientServer(clientObj) { // ИСПРАВЛЕНО
   });
   if (response.ok) {
     document.querySelector('.popup-new__preloader').classList.add('popup-new__preloader--hidden')
-    //если респонс - ОК закрываем ПОАП, чистим попап, чистим tbody,загружаем новый список криентов с сервера в Аррей, рендерим таблицу из Нового Аррея, чистим поле ошибок
+    //если респонс - ОК закрываем ПОАП, чистим попап
     document.querySelector('.popup-new').classList.remove('open');
     cleanPopUp()
-    clearTable()
-    loadClientsArrFromServer()
-    renderClientsTable(clientsArray)
-    document.querySelector('.popup-new__error-msg-box').innerHTML = ' '
   } else {
     //ЕСЛИ Респонс не ОК, то обрвтно убираем прелоадер и выводим ссобщения об ошибках
     document.querySelector('.popup-new__preloader').classList.add('popup-new__preloader--hidden')
@@ -769,7 +764,7 @@ document.getElementById('btn-change-client').addEventListener('click', function 
     changeClientServer(changedClient)
 
     // clientsArray.push(changedClient)
-    clearTable()
+    // clearTable()
     renderClientsTable(clientsArray)
     document.querySelector('.popup-new__error-msg-box').innerHTML = ' '
 
@@ -805,8 +800,8 @@ filter.addEventListener('keyup', function (elem) {
     let searchBarValue = filter.value
     clientsArray = await getSearchFromServer(searchBarValue)
     renderClientsTable(clientsArray)
-    clearTable()
-    renderClientsTable(clientsArray)
+    // clearTable()
+    // renderClientsTable(clientsArray)
   }, 300)
 })
 
@@ -842,7 +837,7 @@ function sortColumns(columnName, clientProperty, mainArr) {
     }
 
     sortArray(mainArr, clientProperty, switcher)
-    clearTable()
+    // clearTable()
     renderClientsTable(mainArr)
   })
 
